@@ -3,6 +3,12 @@
 
 """NVIDIA AI Services."""
 
+# Re-export Riva services
+try:  # pragma: no cover - optional import
+    from .riva_offline_stt import RivaOfflineSTTService
+except Exception:  # noqa: BLE001
+    RivaOfflineSTTService = None  # type: ignore
+
 # Re-export OpenAI speech services when available
 try:  # pragma: no cover - optional import
     from .openai_speech import (
@@ -16,6 +22,7 @@ except Exception:  # noqa: BLE001
     OpenAITTSService = None  # type: ignore
 
 __all__ = [
+    "RivaOfflineSTTService",
     "OpenAIRealtimeASRService",
     "OpenAIRealtimeTTSService",
     "OpenAITTSService",

@@ -50,6 +50,49 @@ def _get_fraud_case(phone: str) -> Dict[str, Any]:
     return dict((data.get("fraud_cases", {}) or {}).get(ph, {}))
 
 
+def _find_customer_by_name(provided_name: str) -> Optional[Dict[str, Any]]:
+    """Find customer by name across all customers.
+    
+    Returns the customer dict with an added 'phone' key if found, None otherwise.
+    """
+    if not provided_name or not isinstance(provided_name, str):
+        return None
+    
+    provided = provided_name.strip().lower()
+    if not provided:
+        return None
+    
+    data = _load_fixture("customers.json")
+    customers = data.get("customers", {})
+    
+    provided_parts = provided.split()
+    
+    for phone, customer in customers.items():
+        expected_name = customer.get("name", "").lower()
+        name_parts = expected_name.split()
+        
+        # Check if any significant part matches (first or last name)
+        match_found = False
+        for provided_part in provided_parts:
+            if len(provided_part) >= 2:  # Only check meaningful parts
+                for name_part in name_parts:
+                    if provided_part in name_part or name_part in provided_part:
+                        match_found = True
+                        break
+        
+        # Also check full name match
+        if provided in expected_name or expected_name in provided:
+            match_found = True
+        
+        if match_found:
+            # Return customer with phone number included
+            result = dict(customer)
+            result['phone'] = phone
+            return result
+    
+    return None
+
+
 def _get_next_steps_template(fraud_type: str) -> Dict[str, Any]:
     """Get next steps template based on fraud type."""
     data = _load_fixture("next_steps.json")
@@ -71,7 +114,7 @@ def verify_name(session_id: str, phone: str, provided_name: str) -> Dict[str, An
     
     Args:
         session_id: Current session ID
-        phone: Customer phone number
+        phone: Customer phone number (may be invalid/fake)
         provided_name: Name provided by the caller
     
     Returns:
@@ -85,6 +128,13 @@ def verify_name(session_id: str, phone: str, provided_name: str) -> Dict[str, An
     """
     ph = _normalize_phone(phone) or ""
     cust = _get_customer(ph)
+    
+    # If phone lookup fails, try to find customer by name
+    if not cust:
+        cust = _find_customer_by_name(provided_name)
+        if cust:
+            # Customer was found by name, use their actual phone
+            ph = cust.get('phone', '')
     
     if not cust:
         return {

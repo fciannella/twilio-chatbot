@@ -292,6 +292,14 @@ def agent(messages: List[BaseMessage], previous: List[BaseMessage] | None, confi
     # IMPORTANT: We maintain full context by merging previous and new messages
     prev_list = list(previous or [])
     new_list = list(messages or [])
+    
+    # DIAGNOSTIC: Log message counts and types
+    logger.info("=== AGENT ENTRY === prev=%s new=%s", len(prev_list), len(new_list))
+    for i, msg in enumerate(new_list):
+        msg_type = type(msg).__name__
+        msg_content = str(getattr(msg, "content", ""))[:100]
+        logger.info("  new_list[%s]: type=%s content=%s", i, msg_type, msg_content)
+    
     convo: List[BaseMessage] = prev_list + new_list
     
     # Trim to avoid context bloat but keep enough history for context awareness
@@ -301,6 +309,18 @@ def agent(messages: List[BaseMessage], previous: List[BaseMessage] | None, confi
     # Sanitize to avoid orphan tool messages after trimming
     convo = _sanitize_conversation(convo)
     thread_id = _get_thread_id(config, new_list)
+    
+    # Log incoming user messages
+    logger.info("=== CHECKING FOR USER MESSAGES === new_list length=%s", len(new_list))
+    for msg in new_list:
+        logger.info("  Message type: %s, is HumanMessage: %s", type(msg).__name__, isinstance(msg, HumanMessage))
+        if isinstance(msg, HumanMessage):
+            user_content = getattr(msg, "content", "") or ""
+            if isinstance(user_content, str) and user_content.strip():
+                logger.info("USER MESSAGE [thread=%s]: %s", thread_id, user_content)
+            else:
+                logger.info("  HumanMessage but content is empty or not a string")
+    
     logger.info("agent start: thread_id=%s total_in=%s (prev=%s, new=%s), maintaining_context=True", thread_id, len(convo), len(prev_list), len(new_list))
     # Establish default session context
     conf = (config or {}).get("configurable", {}) if isinstance(config, dict) else {}

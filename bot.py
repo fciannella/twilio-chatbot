@@ -25,11 +25,15 @@ from pipecat.transports.websocket.fastapi import (
     FastAPIWebsocketParams,
     FastAPIWebsocketTransport,
 )
+
+from pipecat.services.openai.stt import OpenAISTTService
+
 from pathlib import Path
 
 from nvidia_pipecat.pipeline.ace_pipeline_runner import ACEPipelineRunner, PipelineMetadata
 
 from nvidia_pipecat.services.riva_speech import RivaASRService, RivaTTSService
+from nvidia_pipecat.services.riva_offline_stt import RivaOfflineSTTService
 
 from nvidia_pipecat.transports.network.ace_fastapi_websocket import (
     ACETransport,
@@ -48,7 +52,7 @@ logger.add(sys.stderr, level="DEBUG")
 
 
 async def run_bot(transport: BaseTransport, handle_sigint: bool):
-    llm = OpenAILLMService(api_key=os.getenv("OPENAI_API_KEY"))
+    # llm = OpenAILLMService(api_key=os.getenv("OPENAI_API_KEY"))
 
 
     llm = LangGraphLLMService(
@@ -60,14 +64,37 @@ async def run_bot(transport: BaseTransport, handle_sigint: bool):
     )
 
 
-    stt = RivaASRService(
-        # server=os.getenv("RIVA_ASR_URL", "localhost:50051"), # default url is grpc.nvcf.nvidia.com:443
+    # === STT Service Options ===
+    
+    # Option 1: Riva Offline STT (Recommended - More reliable than streaming)
+    stt = RivaOfflineSTTService(
         api_key=os.getenv("RIVA_API_KEY"),
-        function_id=os.getenv("NVIDIA_ASR_FUNCTION_ID", "52b117d2-6c15-4cfa-a905-a67013bee409"),
+        function_id=os.getenv("RIVA_OFFLINE_ASR_FUNCTION_ID", "0e9b18a0-7919-4ffe-944d-2eb394cd69c6"),
+        version_id=os.getenv("RIVA_OFFLINE_ASR_VERSION_ID", "46e36c4d-d350-44aa-aa01-69f84a4a1f4e"),
         language=os.getenv("RIVA_ASR_LANGUAGE", "en-US"),
-        sample_rate=16000,
-        model=os.getenv("RIVA_ASR_MODEL", "parakeet-1.1b-en-US-asr-streaming-silero-vad-asr-bls-ensemble"),
+        sample_rate=8000,  # Match Twilio's sample rate
+        enable_diarization=False,  # Set True to identify different speakers
+        automatic_punctuation=False,
+        profanity_filter=False,
     )
+    
+    # Option 2: Riva Streaming STT (Has some reliability issues)
+    # stt = RivaASRService(
+    #     # server=os.getenv("RIVA_ASR_URL", "localhost:50051"), # default url is grpc.nvcf.nvidia.com:443
+    #     api_key=os.getenv("RIVA_API_KEY"),
+    #     function_id=os.getenv("NVIDIA_ASR_FUNCTION_ID", "52b117d2-6c15-4cfa-a905-a67013bee409"),
+    #     language=os.getenv("RIVA_ASR_LANGUAGE", "en-US"),
+    #     sample_rate=16000,
+    #     model=os.getenv("RIVA_ASR_MODEL", "parakeet-1.1b-en-US-asr-streaming-silero-vad-asr-bls-ensemble"),
+    # )
+
+    # Option 3: OpenAI STT
+    # stt = OpenAISTTService(
+    #     api_key=os.getenv("OPENAI_API_KEY"),
+    #     model="gpt-4o-transcribe",
+    #     prompt="Expect words related to dogs, such as breed names.",
+    # )
+
 
     tts = RivaTTSService(
         # server=os.getenv("RIVA_TTS_URL", "localhost:50051"), # default url is grpc.nvcf.nvidia.com:443
