@@ -31,15 +31,13 @@ TwiML fetched → WebSocket connection → Bot conversation
 ### AI Services
 
 - OpenAI API key for the LLM inference
-- Deepgram API key for speech-to-text
-- Cartesia API key for text-to-speech
 
 ### System
 
 - Python 3.10+
 - `uv` package manager
 - ngrok (for local development)
-- Docker (for production deployment)
+
 
 ## Setup
 
@@ -48,7 +46,14 @@ TwiML fetched → WebSocket connection → Bot conversation
 ```bash
 cd outbound
 uv sync
+uv pip install -r agents/requirements.txt 
+uv pip install av
+uv pip install opentelemetry-api opentelemetry-sdk
+uv pip install "nvidia-riva-client==2.20.0"
 ```
+
+
+
 
 2. Get your Twilio credentials:
 
@@ -66,20 +71,15 @@ cp env.example .env
 
 The bot supports two deployment modes controlled by the `ENV` variable:
 
-### Local Development (`ENV=local`)
-
-- Uses your local server or ngrok URL for WebSocket connections
-- Default configuration for development and testing
-- WebSocket connections go directly to your running server
-
-### Production (`ENV=production`)
-
-- Uses Pipecat Cloud WebSocket URLs automatically
-- Requires `AGENT_NAME` and `ORGANIZATION_NAME` from your Pipecat Cloud deployment
-- Set these when deploying to production environments
-- WebSocket connections route through Pipecat Cloud infrastructure
 
 ## Local Development
+
+0. Start langgraph:
+
+  ```bash
+    cd agents
+    uv run langgraph dev
+  ```
 
 1. Start the outbound bot server:
 
@@ -143,69 +143,3 @@ Replace:
 - `your-ngrok-url.ngrok.io` with your actual ngrok URL
 - `+1234567890` with the phone number you want to call
 
-## Production Deployment
-
-### 1. Deploy your Bot to Pipecat Cloud
-
-Follow the [quickstart instructions](https://docs.pipecat.ai/getting-started/quickstart#step-2%3A-deploy-to-production) to deploy your bot to Pipecat Cloud.
-
-### 2. Configure Production Environment
-
-Update your production `.env` file with the Pipecat Cloud details:
-
-```bash
-# Set to production mode
-ENV=production
-
-# Your Pipecat Cloud deployment details
-AGENT_NAME=your-agent-name
-ORGANIZATION_NAME=your-org-name
-
-# Keep your existing Twilio and AI service keys
-```
-
-### 3. Deploy the Server
-
-The `server.py` handles outbound call initiation and should be deployed separately from your bot:
-
-- **Bot**: Runs on Pipecat Cloud (handles the conversation)
-- **Server**: Runs on your infrastructure (initiates calls, serves TwiML responses)
-
-When `ENV=production`, the server automatically routes WebSocket connections to your Pipecat Cloud bot.
-
-> Alternatively, you can test your Pipecat Cloud deployment by running your server locally.
-
-### Call your Bot
-
-As you did before, initiate a call via `curl` command to trigger your bot to dial a number.
-
-## Accessing Call Information in Your Bot
-
-Your bot automatically receives call information and body data through Twilio's Parameters:
-
-- **Body Data**: Any data you include in the `body` field is passed as a JSON string in the `body` parameter
-
-The Pipecat development runner extracts this data using the `parse_telephony_websocket` function:
-
-```python
-async def bot(runner_args: RunnerArguments):
-    transport_type, call_data = await parse_telephony_websocket(runner_args.websocket)
-
-    if transport_type == "twilio":
-        # Body data (JSON string parameter)
-        import json
-        body_param = call_data["custom_parameters"].get("body")
-        if body_param:
-            body_data = json.loads(body_param)
-
-            # Access nested data
-            user_data = body_data.get("user", {})
-            user_id = user_data.get("id")
-            user_name = user_data.get("name")
-            user_account_type = user_data.get("account_type")
-
-            # Use this data to personalize the conversation
-            print(f"User: {user_name} (ID: {user_id}, Type: {user_account_type})")
-```
-
-This allows your bot to provide personalized responses based on the body data and context.
