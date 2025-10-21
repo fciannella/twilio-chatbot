@@ -1,0 +1,90 @@
+{
+  "fraud_cases": {
+    "+15551234567": {
+      "case_id": "FRAUD-2025-00142",
+      "detected_at": "2025-10-20T14:23:15Z",
+      "fraud_type": "unauthorized_transaction",
+      "severity": "high",
+      "transactions": [
+        {
+          "transaction_id": "TXN-7891234",
+          "amount": 1250.00,
+          "currency": "USD",
+          "merchant": "Electronics Store XYZ",
+          "location": "Los Angeles, CA",
+          "timestamp": "2025-10-20T14:15:00Z",
+          "status": "flagged"
+        },
+        {
+          "transaction_id": "TXN-7891235",
+          "amount": 890.50,
+          "currency": "USD",
+          "merchant": "Online Marketplace ABC",
+          "location": "Online",
+          "timestamp": "2025-10-20T14:18:30Z",
+          "status": "flagged"
+        }
+      ],
+      "total_amount": 2140.50,
+      "card_last_four": "4532",
+      "card_status": "temporarily_blocked",
+      "actions_taken": [
+        "Card temporarily blocked",
+        "Email notification sent",
+        "Outbound call initiated"
+      ],
+      "customer_notified": false,
+      "requires_verification": true
+    },
+    "+447911123456": {
+      "case_id": "FRAUD-2025-00156",
+      "detected_at": "2025-10-20T10:45:22Z",
+      "fraud_type": "card_skimming",
+      "severity": "medium",
+      "transactions": [
+        {
+          "transaction_id": "TXN-4567890",
+          "amount": 45.99,
+          "currency": "GBP",
+          "merchant": "Gas Station",
+          "location": "Manchester, UK",
+          "timestamp": "2025-10-20T10:30:00Z",
+          "status": "flagged"
+        }
+      ],
+      "total_amount": 45.99,
+      "card_last_four": "8791",
+      "card_status": "active_monitoring",
+      "actions_taken": [
+        "Transaction declined",
+        "Enhanced monitoring enabled"
+      ],
+      "customer_notified": false,
+      "requires_verification": true
+    },
+    "+19175551234": {
+      "case_id": "FRAUD-2025-00189",
+      "detected_at": "2025-10-20T16:12:05Z",
+      "fraud_type": "account_takeover_attempt",
+      "severity": "critical",
+      "transactions": [],
+      "total_amount": 0.0,
+      "card_last_four": "3421",
+      "card_status": "fully_blocked",
+      "actions_taken": [
+        "Account access temporarily suspended",
+        "Password reset required",
+        "All cards blocked",
+        "Security team notified"
+      ],
+      "suspicious_activity": [
+        "Multiple failed login attempts from foreign IP",
+        "Attempt to change contact information",
+        "Unusual device and browser fingerprint"
+      ],
+      "customer_notified": false,
+      "requires_verification": true
+    }
+  }
+}
+

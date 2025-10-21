@@ -1,0 +1,35 @@
+{
+  "customers": {
+    "+15551234567": {
+      "name": "Alex Johnson",
+      "account_number": "ACC-10012345",
+      "phone": "+15551234567",
+      "email": "alex.johnson@example.com",
+      "card_last_four": "4532",
+      "card_type": "Visa",
+      "account_status": "active",
+      "preferred_contact": "phone"
+    },
+    "+447911123456": {
+      "name": "Sarah Williams",
+      "account_number": "ACC-10098765",
+      "phone": "+447911123456",
+      "email": "sarah.williams@example.com",
+      "card_last_four": "8791",
+      "card_type": "Mastercard",
+      "account_status": "active",
+      "preferred_contact": "phone"
+    },
+    "+19175551234": {
+      "name": "Michael Chen",
+      "account_number": "ACC-10056789",
+      "phone": "+19175551234",
+      "email": "michael.chen@example.com",
+      "card_last_four": "3421",
+      "card_type": "Amex",
+      "account_status": "active",
+      "preferred_contact": "email"
+    }
+  }
+}
+

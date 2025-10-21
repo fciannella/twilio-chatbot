@@ -1,0 +1,15 @@
+langchain
+langgraph
+langgraph-cli[inmem]
+langgraph-sdk
+langchain_openai
+gradio
+matplotlib
+seaborn
+pytz
+docling
+pymongo
+yt_dlp
+requests
+protobuf==6.31.1
+twilio

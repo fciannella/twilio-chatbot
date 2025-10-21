@@ -1,0 +1,57 @@
+{
+  "next_steps_templates": {
+    "unauthorized_transaction": {
+      "immediate": [
+        "Card has been temporarily blocked to prevent further unauthorized charges",
+        "You will receive a new card within 5-7 business days",
+        "Disputed charges will be credited back to your account within 3-5 business days"
+      ],
+      "followup": [
+        "Monitor your account for any additional suspicious activity",
+        "Review your recent transactions and report any other unfamiliar charges",
+        "Update any automatic payments linked to your old card number"
+      ],
+      "contact_info": {
+        "fraud_hotline": "1-800-FRAUD-HELP",
+        "email": "fraud@bank.example.com",
+        "hours": "24/7"
+      }
+    },
+    "card_skimming": {
+      "immediate": [
+        "The suspicious transaction was declined automatically",
+        "Your card remains active with enhanced monitoring",
+        "No action needed unless you notice other unfamiliar charges"
+      ],
+      "followup": [
+        "Be cautious when using your card at ATMs and gas stations",
+        "Check your card reader for any unusual devices before swiping",
+        "Review your statements regularly"
+      ],
+      "contact_info": {
+        "fraud_hotline": "1-800-FRAUD-HELP",
+        "email": "fraud@bank.example.com",
+        "hours": "24/7"
+      }
+    },
+    "account_takeover_attempt": {
+      "immediate": [
+        "Your account has been secured and access temporarily restricted",
+        "All cards have been blocked as a precaution",
+        "You must reset your password before regaining access"
+      ],
+      "followup": [
+        "Enable two-factor authentication on your account",
+        "Use a strong, unique password that you haven't used elsewhere",
+        "Never share your login credentials with anyone",
+        "Be wary of phishing emails or calls asking for your information"
+      ],
+      "contact_info": {
+        "security_team": "1-800-SEC-HELP",
+        "email": "security@bank.example.com",
+        "hours": "24/7"
+      }
+    }
+  }
+}
+
